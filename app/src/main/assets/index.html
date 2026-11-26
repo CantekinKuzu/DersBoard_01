@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+<title>Ders Göstergesi</title>
+<style>
+  :root{
+    --bg:#0b1020; --panel:#121a30; --line:#24314f; --txt:#e8eefc;
+    --dim:#7487ab; --accent:#38bdf8; --warn:#f59e0b;
+  }
+  *{box-sizing:border-box; -webkit-tap-highlight-color:transparent;}
+  html,body{margin:0; padding:0; background:var(--bg); color:var(--txt);
+    font-family:"Segoe UI",system-ui,sans-serif; overscroll-behavior:none;}
+  .wrap{max-width:460px; margin:0 auto; padding:10px 10px 24px;}
+  /* gün sekmeleri */
+  .days{display:flex; gap:4px; margin-bottom:8px;}
+  .days button{flex:1; padding:9px 0; border:1px solid var(--line); background:var(--panel);
+    color:var(--dim); border-radius:8px; font-size:13px; font-weight:600; cursor:pointer;}
+  .days button.sel{background:var(--accent); border-color:var(--accent); color:#06131f;}
+  .days button.today{box-shadow:inset 0 -3px 0 var(--accent);}
+  /* dikey gösterge */
+  .gauge{position:relative; background:radial-gradient(ellipse at 0% 50%,#101a35 0%,var(--bg) 75%);
+    border:1px solid var(--line); border-radius:14px; overflow:hidden; touch-action:none;
+    user-select:none;}
+  svg{display:block; width:100%; height:auto;}
+  .readout{position:absolute; right:8px; top:50%; transform:translateY(-130%);
+    text-align:right; pointer-events:none;}
+  .readout .time{font-size:26px; font-weight:700; font-variant-numeric:tabular-nums;
+    letter-spacing:1px; color:#fff; text-shadow:0 0 12px rgba(56,189,248,.5);}
+  .readout .mode{font-size:10px; color:var(--accent); letter-spacing:2px; font-weight:600;}
+  .readout .mode.manual{color:var(--warn);}
+  /* durum kartları */
+  .status{display:flex; flex-direction:column; gap:8px; margin-top:10px;}
+  .card{background:var(--panel); border:1px solid var(--line); border-radius:10px;
+    padding:9px 12px; min-width:0;}
+  .card .lbl{font-size:10px; letter-spacing:1.5px; color:var(--dim); text-transform:uppercase;}
+  .card .val{font-size:16px; font-weight:700; margin-top:3px; white-space:nowrap;
+    overflow:hidden; text-overflow:ellipsis;}
+  .card .sub{font-size:12px; color:var(--dim); margin-top:2px; font-variant-numeric:tabular-nums;}
+  .dot{display:inline-block; width:9px; height:9px; border-radius:50%; margin-right:6px;}
+  /* butonlar */
+  .controls{display:flex; gap:8px; margin-top:10px;}
+  .controls button{flex:1; padding:11px 0; border-radius:10px; border:1px solid var(--line);
+    background:var(--panel); color:var(--txt); font-size:14px; font-weight:600; cursor:pointer;}
+  .controls button.primary{background:var(--accent); border-color:var(--accent); color:#06131f;}
+  /* veri giriş paneli */
+  .editor{display:none; margin-top:12px; background:var(--panel); border:1px solid var(--line);
+    border-radius:12px; padding:12px;}
+  .editor.open{display:block;}
+  .editor h2{font-size:13px; margin:0 0 8px; color:var(--dim); font-weight:600;}
+  .row{display:flex; gap:5px; align-items:center; margin-bottom:6px;}
+  .row input[type=text]{flex:1; min-width:0; background:#0d1530; border:1px solid var(--line);
+    color:var(--txt); border-radius:7px; padding:7px 7px; font-size:13px;}
+  .row input[type=color]{flex:0 0 36px; height:34px; padding:2px; background:#0d1530;
+    border:1px solid var(--line); border-radius:7px; cursor:pointer;}
+  .row input[type=time]{flex:0 0 76px; background:#0d1530; border:1px solid var(--line);
+    color:var(--txt); border-radius:7px; padding:7px 3px; font-size:13px;
+    font-variant-numeric:tabular-nums;}
+  .row .del{flex:0 0 30px; background:#2a1620; border:1px solid #4a2533; color:#f87171;
+    border-radius:7px; padding:7px 0; font-size:13px; cursor:pointer;}
+  .editor .ebtns{display:flex; gap:6px; margin-top:10px; flex-wrap:wrap;}
+  .editor .ebtns button{flex:1; min-width:110px; padding:9px 4px; border-radius:8px;
+    border:1px solid var(--line); background:#0d1530; color:var(--txt); font-size:12.5px;
+    font-weight:600; cursor:pointer;}
+  .editor .ebtns .save{background:#22c55e; border-color:#22c55e; color:#06230f;}
+  .hint{font-size:11px; color:var(--dim); margin-top:8px; line-height:1.5;}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="days" id="days"></div>
+
+  <div class="gauge" id="gauge">
+    <svg id="svg" viewBox="0 0 320 560" xmlns="http://www.w3.org/2000/svg">
+      <g id="rot"></g>
+      <!-- sabit ibre (yatay, sağda) -->
+      <line x1="314" y1="280" x2="276" y2="280" stroke="#ffffff" stroke-width="3"/>
+      <path d="M314 272 L314 288 L300 280 Z" fill="#ffffff"/>
+    </svg>
+    <div class="readout">
+      <div class="time" id="clock">--:--</div>
+      <div class="mode" id="mode">ŞİMDİ</div>
+    </div>
+  </div>
+
+  <div class="status">
+    <div class="card">
+      <div class="lbl">Bu an</div>
+      <div class="val" id="curName">—</div>
+      <div class="sub" id="curSub"></div>
+    </div>
+    <div class="card">
+      <div class="lbl">Sıradaki</div>
+      <div class="val" id="nextName">—</div>
+      <div class="sub" id="nextSub"></div>
+    </div>
+  </div>
+
+  <div class="controls">
+    <button class="primary" id="nowBtn">Şimdi</button>
+    <button id="editBtn">Veri giriş</button>
+  </div>
+
+  <div class="editor" id="editor">
+    <h2 id="editTitle">Program</h2>
+    <div id="rows"></div>
+    <div class="ebtns">
+      <button id="addRow">+ Dilim ekle</button>
+      <button id="copyDay">Diğer günlere kopyala</button>
+      <button class="save" id="saveBtn">Kaydet</button>
+    </div>
+    <div class="hint">Her dilim için isim, renk, başlangıç ve bitiş saati gir.
+    Gösterge aralığı 08:30–17:00; kayıt bu tarayıcıda saklanır.</div>
+  </div>
+</div>
+
+<script>
+"use strict";
+const DAYS=["Pzt","Sal","Çar","Per","Cum"];
+const START=8*60+30, END=17*60, SPAN=END-START;       // 08:30–17:00 = 360°
+const CX=10, CY=280, R_SEG=200, R_TICK=240;
+
+// ---- yardımcılar ----
+const pad=n=>String(n).padStart(2,"0");
+const fmt=m=>pad(Math.floor(m/60))+":"+pad(Math.floor(m%60));
+const toMin=s=>{const[a,b]=s.split(":").map(Number); return a*60+b;};
+const clamp=t=>Math.min(Math.max(t,START),END);
+const a4t=t=>(t-START)/SPAN*360;                       // dakika -> derece (0° = ibre, saat yönü)
+function pol(ang,r){const a=ang*Math.PI/180; return [CX+r*Math.cos(a), CY+r*Math.sin(a)];}
+function arcPath(a1,a2,r){
+  const [x1,y1]=pol(a1,r),[x2,y2]=pol(a2,r);
+  return `M${x1.toFixed(2)} ${y1.toFixed(2)} A${r} ${r} 0 ${(a2-a1)>180?1:0} 1 ${x2.toFixed(2)} ${y2.toFixed(2)}`;
+}
+
+// ---- veri ----
+let schedule={};
+for(let i=0;i<5;i++) schedule[i]=[];
+try{
+  const raw=localStorage.getItem("dersGauge.v2");
+  if(raw){const p=JSON.parse(raw); if(p&&typeof p==="object") schedule=p;}
+}catch(e){}
+function saveStore(){ try{localStorage.setItem("dersGauge.v2",JSON.stringify(schedule));}catch(e){} }
+function segsFor(day){ return (schedule[day]||[]).slice().sort((a,b)=>a.s-b.s); }
+
+// ---- durum ----
+const d0=new Date(), wd=(d0.getDay()+6)%7;
+let selDay=Math.min(wd,4), todayIdx=(wd<5?wd:-1);
+let live=true, viewTime=START, dragging=false, lastAng=0;
+
+// ---- çizim ----
+const rot=document.getElementById("rot");
+function buildRing(){
+  let h="";
+  // zemin halkası
+  h+=`<circle cx="${CX}" cy="${CY}" r="${R_SEG}" fill="none" stroke="#2a3552" stroke-width="30" opacity="0.5"/>`;
+  // dilimler
+  for(const s of segsFor(selDay)){
+    const a1=a4t(clamp(s.s)), a2=a4t(clamp(s.e));
+    if(a2<=a1) continue;
+    h+=`<path d="${arcPath(a1,a2,R_SEG)}" fill="none" stroke="${s.c}" stroke-width="30" stroke-linecap="butt"/>`;
+    const mid=(a1+a2)/2, [lx,ly]=pol(mid,R_SEG);
+    const short=(s.n||"").slice(0,8);
+    if(a2-a1>=16)
+      h+=`<text x="${lx}" y="${ly}" font-size="12" font-weight="700" fill="#06131f" text-anchor="middle" dominant-baseline="central" transform="rotate(${mid+90} ${lx} ${ly})">${short}</text>`;
+  }
+  // başlangıç/bitiş dikişi
+  const [sx1,sy1]=pol(0,R_SEG-18),[sx2,sy2]=pol(0,R_TICK);
+  h+=`<line x1="${sx1}" y1="${sy1}" x2="${sx2}" y2="${sy2}" stroke="#ffffff" stroke-width="1.5" opacity="0.35" stroke-dasharray="3 3"/>`;
+  // tikler + saat yazıları
+  for(let m=START;m<END;m+=10){
+    const ang=a4t(m), hour=m%60===0, half=m%30===0;
+    const len=hour?16:(half?10:5);
+    const [x1,y1]=pol(ang,R_TICK),[x2,y2]=pol(ang,R_TICK-len);
+    h+=`<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="${hour?"#9fb3d9":"#46597f"}" stroke-width="${hour?2:1}"/>`;
+    if(hour){
+      const [tx,ty]=pol(ang,R_TICK+16);
+      h+=`<text x="${tx}" y="${ty}" font-size="13" fill="#9fb3d9" text-anchor="middle" dominant-baseline="central" transform="rotate(${ang} ${tx} ${ty})">${pad(m/60)}</text>`;
+    }
+  }
+  rot.innerHTML=h;
+}
+function setRotation(){ rot.setAttribute("transform",`rotate(${(-a4t(viewTime)).toFixed(3)} ${CX} ${CY})`); }
+
+// ---- durum kartları ----
+function updateStatus(){
+  const segs=segsFor(selDay), t=viewTime;
+  const cur=segs.find(s=>t>=s.s&&t<s.e);
+  const nxt=segs.find(s=>s.s>t);
+  const cN=document.getElementById("curName"),cS=document.getElementById("curSub");
+  const nN=document.getElementById("nextName"),nS=document.getElementById("nextSub");
+  if(cur){
+    cN.innerHTML=`<span class="dot" style="background:${cur.c}"></span>${cur.n}`;
+    cS.textContent=`${fmt(cur.s)}–${fmt(cur.e)} · kalan ${Math.ceil(cur.e-t)} dk`;
+  }else{
+    cN.textContent=segs.length?"Boş":"Program girilmedi"; cS.textContent="";
+  }
+  if(nxt){
+    nN.innerHTML=`<span class="dot" style="background:${nxt.c}"></span>${nxt.n}`;
+    nS.textContent=`${fmt(nxt.s)} · ${Math.ceil(nxt.s-t)} dk sonra`;
+  }else{nN.textContent="—"; nS.textContent="";}
+  document.getElementById("clock").textContent=fmt(viewTime);
+  const mode=document.getElementById("mode");
+  const nowRaw=nowMin();
+  mode.textContent=live?(nowRaw<START||nowRaw>END?"GÜN DIŞI":"ŞİMDİ"):"ELLE";
+  mode.className="mode"+(live?"":" manual");
+}
+function refresh(){ setRotation(); updateStatus(); }
+
+// ---- gün sekmeleri ----
+function buildDays(){
+  const el=document.getElementById("days"); el.innerHTML="";
+  DAYS.forEach((d,i)=>{
+    const b=document.createElement("button");
+    b.textContent=d;
+    b.className=(i===selDay?"sel ":"")+(i===todayIdx?"today":"");
+    b.onclick=()=>{selDay=i; buildDays(); buildRing(); buildEditor(); refresh();};
+    el.appendChild(b);
+  });
+}
+
+// ---- şimdi modu ----
+function nowMin(){const d=new Date(); return d.getHours()*60+d.getMinutes()+d.getSeconds()/60;}
+function tick(){ if(live){ viewTime=clamp(nowMin()); refresh(); } }
+setInterval(tick,1000);
+document.getElementById("nowBtn").onclick=()=>{ live=true; tick(); };
+
+// ---- sürükleme ----
+const svg=document.getElementById("svg");
+function angOf(ev){
+  const r=svg.getBoundingClientRect();
+  const x=(ev.clientX-r.left)*(320/r.width), y=(ev.clientY-r.top)*(560/r.height);
+  return Math.atan2(y-CY,x-CX)*180/Math.PI;
+}
+svg.addEventListener("pointerdown",ev=>{dragging=true; lastAng=angOf(ev); svg.setPointerCapture(ev.pointerId);});
+svg.addEventListener("pointermove",ev=>{
+  if(!dragging) return;
+  let d=angOf(ev)-lastAng;
+  if(d>180)d-=360; if(d<-180)d+=360;
+  lastAng=angOf(ev);
+  live=false;
+  viewTime=clamp(viewTime - d/360*SPAN);
+  refresh();
+});
+["pointerup","pointercancel"].forEach(e=>svg.addEventListener(e,()=>dragging=false));
+
+// ---- veri giriş ----
+const PALETTE=["#3b82f6","#22c55e","#f59e0b","#a855f7","#ef4444","#14b8a6"];
+const editor=document.getElementById("editor");
+document.getElementById("editBtn").onclick=()=>{
+  editor.classList.toggle("open");
+  if(editor.classList.contains("open")) buildEditor();
+};
+function buildEditor(){
+  document.getElementById("editTitle").textContent=DAYS[selDay]+" programı";
+  const rows=document.getElementById("rows"); rows.innerHTML="";
+  (schedule[selDay]||[]).forEach((b,i)=>{
+    const r=document.createElement("div"); r.className="row";
+    r.innerHTML=`<input type="text" value="${(b.n||"").replace(/"/g,"&quot;")}" placeholder="İsim" data-i="${i}" data-f="n">
+      <input type="color" value="${b.c}" data-i="${i}" data-f="c">
+      <input type="time" value="${fmt(b.s)}" data-i="${i}" data-f="s">
+      <input type="time" value="${fmt(b.e)}" data-i="${i}" data-f="e">
+      <button class="del" data-i="${i}">✕</button>`;
+    rows.appendChild(r);
+  });
+  rows.querySelectorAll("input").forEach(el=>{
+    el.onchange=()=>{
+      const b=schedule[selDay][+el.dataset.i], f=el.dataset.f;
+      if(f==="n"||f==="c") b[f]=el.value; else b[f]=toMin(el.value);
+    };
+  });
+  rows.querySelectorAll(".del").forEach(el=>{
+    el.onclick=()=>{schedule[selDay].splice(+el.dataset.i,1); buildEditor();};
+  });
+}
+document.getElementById("addRow").onclick=()=>{
+  const b=schedule[selDay]||(schedule[selDay]=[]);
+  const last=b.length?Math.max(...b.map(x=>x.e)):toMin("09:00");
+  b.push({n:"", c:PALETTE[b.length%PALETTE.length], s:Math.min(last,END-40), e:Math.min(last+40,END)});
+  buildEditor();
+};
+document.getElementById("copyDay").onclick=()=>{
+  for(let i=0;i<5;i++) if(i!==selDay) schedule[i]=schedule[selDay].map(b=>({...b}));
+  saveStore(); toast("Tüm günlere kopyalandı.");
+};
+document.getElementById("saveBtn").onclick=()=>{
+  schedule[selDay].sort((a,b)=>a.s-b.s);
+  saveStore(); buildRing(); buildEditor(); refresh(); toast("Kaydedildi.");
+};
+function toast(msg){
+  const n=document.createElement("div");
+  n.textContent=msg;
+  n.style.cssText="position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:#22c55e;color:#06230f;padding:8px 16px;border-radius:8px;font-weight:600;font-size:13px;z-index:9";
+  document.body.appendChild(n); setTimeout(()=>n.remove(),1600);
+}
+
+// ---- başlat ----
+viewTime=clamp(nowMin());
+buildDays(); buildRing(); refresh();
+</script>
+</body>
+</html>
