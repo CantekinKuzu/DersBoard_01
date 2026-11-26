@@ -2,7 +2,7 @@
 <html lang="tr">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
 <title>Ders Göstergesi</title>
 <style>
   :root{
@@ -10,60 +10,127 @@
     --dim:#7487ab; --accent:#38bdf8; --warn:#f59e0b;
   }
   *{box-sizing:border-box; -webkit-tap-highlight-color:transparent;}
-  html,body{margin:0; padding:0; background:var(--bg); color:var(--txt);
-    font-family:"Segoe UI",system-ui,sans-serif; overscroll-behavior:none;}
-  .wrap{max-width:460px; margin:0 auto; padding:10px 10px 24px;}
+  html,body{
+    margin:0; padding:0; width:100%; height:100%; overflow:hidden;
+    background:var(--bg); color:var(--txt);
+    font-family:"Segoe UI",system-ui,sans-serif; overscroll-behavior:none;
+  }
+  .wrap{
+    max-width:460px; width:100%; height:100vh; height:100dvh;
+    margin:0 auto; padding:8px 10px 10px;
+    display:flex; flex-direction:column; gap:8px; overflow:hidden;
+  }
+
   /* gün sekmeleri */
-  .days{display:flex; gap:4px; margin-bottom:8px;}
-  .days button{flex:1; padding:9px 0; border:1px solid var(--line); background:var(--panel);
-    color:var(--dim); border-radius:8px; font-size:13px; font-weight:600; cursor:pointer;}
+  .days{display:flex; gap:4px; flex:0 0 auto;}
+  .days button{
+    flex:1; padding:9px 0; border:1px solid var(--line); background:var(--panel);
+    color:var(--dim); border-radius:8px; font-size:13px; font-weight:600; cursor:pointer;
+  }
   .days button.sel{background:var(--accent); border-color:var(--accent); color:#06131f;}
   .days button.today{box-shadow:inset 0 -3px 0 var(--accent);}
-  /* dikey gösterge */
-  .gauge{position:relative; background:radial-gradient(ellipse at 0% 50%,#101a35 0%,var(--bg) 75%);
-    border:1px solid var(--line); border-radius:14px; overflow:hidden; touch-action:none;
-    user-select:none;}
-  svg{display:block; width:100%; height:auto;}
-  .readout{position:absolute; right:8px; top:50%; transform:translateY(-130%);
-    text-align:right; pointer-events:none;}
-  .readout .time{font-size:26px; font-weight:700; font-variant-numeric:tabular-nums;
-    letter-spacing:1px; color:#fff; text-shadow:0 0 12px rgba(56,189,248,.5);}
+
+  /* dikey gösterge - kalan alana otomatik sığar */
+  .gauge{
+    position:relative; flex:1 1 0; min-height:0;
+    background:radial-gradient(ellipse at 0% 50%,#101a35 0%,var(--bg) 75%);
+    border:1px solid var(--line); border-radius:14px; overflow:hidden;
+    touch-action:none; user-select:none;
+    display:flex; align-items:center; justify-content:center;
+  }
+  svg{
+    display:block; width:100%; height:100%;
+    max-width:100%; max-height:100%;
+  }
+  .readout{
+    position:absolute; right:10px; top:50%; transform:translateY(-130%);
+    text-align:right; pointer-events:none;
+  }
+  .readout .time{
+    font-size:clamp(20px, 6vw, 26px); font-weight:700; font-variant-numeric:tabular-nums;
+    letter-spacing:1px; color:#fff; text-shadow:0 0 12px rgba(56,189,248,.5);
+  }
   .readout .mode{font-size:10px; color:var(--accent); letter-spacing:2px; font-weight:600;}
   .readout .mode.manual{color:var(--warn);}
+
   /* durum kartları */
-  .status{display:flex; flex-direction:column; gap:8px; margin-top:10px;}
-  .card{background:var(--panel); border:1px solid var(--line); border-radius:10px;
-    padding:9px 12px; min-width:0;}
-  .card .lbl{font-size:10px; letter-spacing:1.5px; color:var(--dim); text-transform:uppercase;}
-  .card .val{font-size:16px; font-weight:700; margin-top:3px; white-space:nowrap;
-    overflow:hidden; text-overflow:ellipsis;}
-  .card .sub{font-size:12px; color:var(--dim); margin-top:2px; font-variant-numeric:tabular-nums;}
-  .dot{display:inline-block; width:9px; height:9px; border-radius:50%; margin-right:6px;}
+  .status{display:flex; gap:8px; flex:0 0 auto;}
+  .card{
+    flex:1; min-width:0; background:var(--panel); border:1px solid var(--line);
+    border-radius:10px; padding:8px 10px;
+  }
+  .card .lbl{font-size:10px; letter-spacing:1.2px; color:var(--dim); text-transform:uppercase;}
+  .card .val{
+    font-size:15px; font-weight:700; margin-top:2px; white-space:nowrap;
+    overflow:hidden; text-overflow:ellipsis;
+  }
+  .card .sub{
+    font-size:11.5px; color:var(--dim); margin-top:2px; font-variant-numeric:tabular-nums;
+    white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+  }
+  .dot{display:inline-block; width:8px; height:8px; border-radius:50%; margin-right:5px;}
+
   /* butonlar */
-  .controls{display:flex; gap:8px; margin-top:10px;}
-  .controls button{flex:1; padding:11px 0; border-radius:10px; border:1px solid var(--line);
-    background:var(--panel); color:var(--txt); font-size:14px; font-weight:600; cursor:pointer;}
+  .controls{display:flex; gap:8px; flex:0 0 auto;}
+  .controls button{
+    flex:1; padding:11px 0; border-radius:10px; border:1px solid var(--line);
+    background:var(--panel); color:var(--txt); font-size:14px; font-weight:600; cursor:pointer;
+  }
   .controls button.primary{background:var(--accent); border-color:var(--accent); color:#06131f;}
-  /* veri giriş paneli */
-  .editor{display:none; margin-top:12px; background:var(--panel); border:1px solid var(--line);
-    border-radius:12px; padding:12px;}
-  .editor.open{display:block;}
-  .editor h2{font-size:13px; margin:0 0 8px; color:var(--dim); font-weight:600;}
+
+  /* tam ekran düzenleme paneli */
+  .editor-modal{
+    display:none; position:fixed; inset:0; z-index:20;
+    background:var(--bg); overflow-y:auto; -webkit-overflow-scrolling:touch;
+  }
+  .editor-modal.open{display:block;}
+  .editor-inner{
+    max-width:460px; margin:0 auto; padding:12px 10px 28px;
+  }
+  .editor-head{
+    display:flex; align-items:center; justify-content:space-between;
+    margin-bottom:10px; padding-bottom:8px; border-bottom:1px solid var(--line);
+  }
+  .editor-head h2{font-size:15px; margin:0; color:var(--txt); font-weight:700;}
+  .editor-head .close-btn{
+    padding:7px 14px; border-radius:8px; border:1px solid var(--line);
+    background:var(--panel); color:var(--txt); font-size:13px; font-weight:600; cursor:pointer;
+  }
+  .ed-days{display:flex; gap:4px; margin-bottom:10px;}
+  .ed-days button{
+    flex:1; padding:8px 0; border:1px solid var(--line); background:var(--panel);
+    color:var(--dim); border-radius:8px; font-size:12.5px; font-weight:600; cursor:pointer;
+  }
+  .ed-days button.sel{background:var(--accent); border-color:var(--accent); color:#06131f;}
+  .editor-box{
+    background:var(--panel); border:1px solid var(--line);
+    border-radius:12px; padding:12px;
+  }
   .row{display:flex; gap:5px; align-items:center; margin-bottom:6px;}
-  .row input[type=text]{flex:1; min-width:0; background:#0d1530; border:1px solid var(--line);
-    color:var(--txt); border-radius:7px; padding:7px 7px; font-size:13px;}
-  .row input[type=color]{flex:0 0 36px; height:34px; padding:2px; background:#0d1530;
-    border:1px solid var(--line); border-radius:7px; cursor:pointer;}
-  .row input[type=time]{flex:0 0 76px; background:#0d1530; border:1px solid var(--line);
+  .row input[type=text]{
+    flex:1; min-width:0; background:#0d1530; border:1px solid var(--line);
+    color:var(--txt); border-radius:7px; padding:7px 7px; font-size:13px;
+  }
+  .row input[type=color]{
+    flex:0 0 36px; height:34px; padding:2px; background:#0d1530;
+    border:1px solid var(--line); border-radius:7px; cursor:pointer;
+  }
+  .row input[type=time]{
+    flex:0 0 76px; background:#0d1530; border:1px solid var(--line);
     color:var(--txt); border-radius:7px; padding:7px 3px; font-size:13px;
-    font-variant-numeric:tabular-nums;}
-  .row .del{flex:0 0 30px; background:#2a1620; border:1px solid #4a2533; color:#f87171;
-    border-radius:7px; padding:7px 0; font-size:13px; cursor:pointer;}
-  .editor .ebtns{display:flex; gap:6px; margin-top:10px; flex-wrap:wrap;}
-  .editor .ebtns button{flex:1; min-width:110px; padding:9px 4px; border-radius:8px;
-    border:1px solid var(--line); background:#0d1530; color:var(--txt); font-size:12.5px;
-    font-weight:600; cursor:pointer;}
-  .editor .ebtns .save{background:#22c55e; border-color:#22c55e; color:#06230f;}
+    font-variant-numeric:tabular-nums;
+  }
+  .row .del{
+    flex:0 0 30px; background:#2a1620; border:1px solid #4a2533; color:#f87171;
+    border-radius:7px; padding:7px 0; font-size:13px; cursor:pointer;
+  }
+  .ebtns{display:flex; gap:6px; margin-top:10px; flex-wrap:wrap;}
+  .ebtns button{
+    flex:1; min-width:110px; padding:10px 4px; border-radius:8px;
+    border:1px solid var(--line); background:#0d1530; color:var(--txt); font-size:13px;
+    font-weight:600; cursor:pointer;
+  }
+  .ebtns .save{background:#22c55e; border-color:#22c55e; color:#06230f;}
   .hint{font-size:11px; color:var(--dim); margin-top:8px; line-height:1.5;}
 </style>
 </head>
@@ -72,7 +139,7 @@
   <div class="days" id="days"></div>
 
   <div class="gauge" id="gauge">
-    <svg id="svg" viewBox="0 0 320 560" xmlns="http://www.w3.org/2000/svg">
+    <svg id="svg" viewBox="0 0 320 560" preserveAspectRatio="xMidYMid meet" xmlns="http://www.w3.org/2000/svg">
       <g id="rot"></g>
       <!-- sabit ibre (yatay, sağda) -->
       <line x1="314" y1="280" x2="276" y2="280" stroke="#ffffff" stroke-width="3"/>
@@ -99,19 +166,28 @@
 
   <div class="controls">
     <button class="primary" id="nowBtn">Şimdi</button>
-    <button id="editBtn">Veri giriş</button>
+    <button id="editBtn">Düzenle</button>
   </div>
+</div>
 
-  <div class="editor" id="editor">
-    <h2 id="editTitle">Program</h2>
-    <div id="rows"></div>
-    <div class="ebtns">
-      <button id="addRow">+ Dilim ekle</button>
-      <button id="copyDay">Diğer günlere kopyala</button>
-      <button class="save" id="saveBtn">Kaydet</button>
+<!-- Tam ekran düzenleme penceresi -->
+<div class="editor-modal" id="editorModal">
+  <div class="editor-inner">
+    <div class="editor-head">
+      <h2 id="editTitle">Program Düzenle</h2>
+      <button class="close-btn" id="closeEditor">Kapat ✕</button>
     </div>
-    <div class="hint">Her dilim için isim, renk, başlangıç ve bitiş saati gir.
-    Gösterge aralığı 08:30–17:00; kayıt bu tarayıcıda saklanır.</div>
+    <div class="ed-days" id="edDays"></div>
+    <div class="editor-box">
+      <div id="rows"></div>
+      <div class="ebtns">
+        <button id="addRow">+ Dilim ekle</button>
+        <button id="copyDay">Diğer günlere kopyala</button>
+        <button class="save" id="saveBtn">Kaydet</button>
+      </div>
+      <div class="hint">Her dilim için isim, renk, başlangıç ve bitiş saati gir.
+      Gösterge aralığı 08:30–17:00; kayıt cihazda saklanır.</div>
+    </div>
   </div>
 </div>
 
@@ -126,7 +202,7 @@ const pad=n=>String(n).padStart(2,"0");
 const fmt=m=>pad(Math.floor(m/60))+":"+pad(Math.floor(m%60));
 const toMin=s=>{const[a,b]=s.split(":").map(Number); return a*60+b;};
 const clamp=t=>Math.min(Math.max(t,START),END);
-const a4t=t=>(t-START)/SPAN*360;                       // dakika -> derece (0° = ibre, saat yönü)
+const a4t=t=>(t-START)/SPAN*360;
 function pol(ang,r){const a=ang*Math.PI/180; return [CX+r*Math.cos(a), CY+r*Math.sin(a)];}
 function arcPath(a1,a2,r){
   const [x1,y1]=pol(a1,r),[x2,y2]=pol(a2,r);
@@ -152,9 +228,7 @@ let live=true, viewTime=START, dragging=false, lastAng=0;
 const rot=document.getElementById("rot");
 function buildRing(){
   let h="";
-  // zemin halkası
   h+=`<circle cx="${CX}" cy="${CY}" r="${R_SEG}" fill="none" stroke="#2a3552" stroke-width="30" opacity="0.5"/>`;
-  // dilimler
   for(const s of segsFor(selDay)){
     const a1=a4t(clamp(s.s)), a2=a4t(clamp(s.e));
     if(a2<=a1) continue;
@@ -164,10 +238,8 @@ function buildRing(){
     if(a2-a1>=16)
       h+=`<text x="${lx}" y="${ly}" font-size="12" font-weight="700" fill="#06131f" text-anchor="middle" dominant-baseline="central" transform="rotate(${mid+90} ${lx} ${ly})">${short}</text>`;
   }
-  // başlangıç/bitiş dikişi
   const [sx1,sy1]=pol(0,R_SEG-18),[sx2,sy2]=pol(0,R_TICK);
   h+=`<line x1="${sx1}" y1="${sy1}" x2="${sx2}" y2="${sy2}" stroke="#ffffff" stroke-width="1.5" opacity="0.35" stroke-dasharray="3 3"/>`;
-  // tikler + saat yazıları
   for(let m=START;m<END;m+=10){
     const ang=a4t(m), hour=m%60===0, half=m%30===0;
     const len=hour?16:(half?10:5);
@@ -191,9 +263,9 @@ function updateStatus(){
   const nN=document.getElementById("nextName"),nS=document.getElementById("nextSub");
   if(cur){
     cN.innerHTML=`<span class="dot" style="background:${cur.c}"></span>${cur.n}`;
-    cS.textContent=`${fmt(cur.s)}–${fmt(cur.e)} · kalan ${Math.ceil(cur.e-t)} dk`;
+    cS.textContent=`${fmt(cur.s)}–${fmt(cur.e)} · ${Math.ceil(cur.e-t)} dk`;
   }else{
-    cN.textContent=segs.length?"Boş":"Program girilmedi"; cS.textContent="";
+    cN.textContent=segs.length?"Boş":"Program yok"; cS.textContent="";
   }
   if(nxt){
     nN.innerHTML=`<span class="dot" style="background:${nxt.c}"></span>${nxt.n}`;
@@ -214,7 +286,7 @@ function buildDays(){
     const b=document.createElement("button");
     b.textContent=d;
     b.className=(i===selDay?"sel ":"")+(i===todayIdx?"today":"");
-    b.onclick=()=>{selDay=i; buildDays(); buildRing(); buildEditor(); refresh();};
+    b.onclick=()=>{selDay=i; buildDays(); buildRing(); refresh();};
     el.appendChild(b);
   });
 }
@@ -225,9 +297,16 @@ function tick(){ if(live){ viewTime=clamp(nowMin()); refresh(); } }
 setInterval(tick,1000);
 document.getElementById("nowBtn").onclick=()=>{ live=true; tick(); };
 
-// ---- sürükleme ----
+// ---- sürükleme (otomatik ölçek uyumlu SVG koordinat dönüşümü) ----
 const svg=document.getElementById("svg");
 function angOf(ev){
+  const pt=svg.createSVGPoint();
+  pt.x=ev.clientX; pt.y=ev.clientY;
+  const ctm=svg.getScreenCTM();
+  if(ctm){
+    const p=pt.matrixTransform(ctm.inverse());
+    return Math.atan2(p.y-CY, p.x-CX)*180/Math.PI;
+  }
   const r=svg.getBoundingClientRect();
   const x=(ev.clientX-r.left)*(320/r.width), y=(ev.clientY-r.top)*(560/r.height);
   return Math.atan2(y-CY,x-CX)*180/Math.PI;
@@ -244,15 +323,30 @@ svg.addEventListener("pointermove",ev=>{
 });
 ["pointerup","pointercancel"].forEach(e=>svg.addEventListener(e,()=>dragging=false));
 
-// ---- veri giriş ----
+// ---- düzenle modalı ----
 const PALETTE=["#3b82f6","#22c55e","#f59e0b","#a855f7","#ef4444","#14b8a6"];
-const editor=document.getElementById("editor");
+const editorModal=document.getElementById("editorModal");
+
 document.getElementById("editBtn").onclick=()=>{
-  editor.classList.toggle("open");
-  if(editor.classList.contains("open")) buildEditor();
+  buildEditor();
+  editorModal.classList.add("open");
 };
+document.getElementById("closeEditor").onclick=()=>{
+  editorModal.classList.remove("open");
+  buildDays(); buildRing(); refresh();
+};
+
 function buildEditor(){
-  document.getElementById("editTitle").textContent=DAYS[selDay]+" programı";
+  document.getElementById("editTitle").textContent=DAYS[selDay]+" Programı";
+  const edDays=document.getElementById("edDays"); edDays.innerHTML="";
+  DAYS.forEach((d,i)=>{
+    const b=document.createElement("button");
+    b.textContent=d;
+    if(i===selDay) b.className="sel";
+    b.onclick=()=>{selDay=i; buildEditor();};
+    edDays.appendChild(b);
+  });
+
   const rows=document.getElementById("rows"); rows.innerHTML="";
   (schedule[selDay]||[]).forEach((b,i)=>{
     const r=document.createElement("div"); r.className="row";
@@ -273,6 +367,7 @@ function buildEditor(){
     el.onclick=()=>{schedule[selDay].splice(+el.dataset.i,1); buildEditor();};
   });
 }
+
 document.getElementById("addRow").onclick=()=>{
   const b=schedule[selDay]||(schedule[selDay]=[]);
   const last=b.length?Math.max(...b.map(x=>x.e)):toMin("09:00");
@@ -285,12 +380,12 @@ document.getElementById("copyDay").onclick=()=>{
 };
 document.getElementById("saveBtn").onclick=()=>{
   schedule[selDay].sort((a,b)=>a.s-b.s);
-  saveStore(); buildRing(); buildEditor(); refresh(); toast("Kaydedildi.");
+  saveStore(); buildDays(); buildRing(); buildEditor(); refresh(); toast("Kaydedildi.");
 };
 function toast(msg){
   const n=document.createElement("div");
   n.textContent=msg;
-  n.style.cssText="position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:#22c55e;color:#06230f;padding:8px 16px;border-radius:8px;font-weight:600;font-size:13px;z-index:9";
+  n.style.cssText="position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:#22c55e;color:#06230f;padding:8px 16px;border-radius:8px;font-weight:600;font-size:13px;z-index:30";
   document.body.appendChild(n); setTimeout(()=>n.remove(),1600);
 }
 
