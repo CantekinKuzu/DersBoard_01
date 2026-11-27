@@ -7,9 +7,9 @@
 <style>
   :root{
     --bg:#38bdf8;
-    --panel:rgba(15, 23, 42, 0.78);
+    --panel:rgba(15, 23, 42, 0.72);
     --panel-solid:#121a30;
-    --line:rgba(255, 255, 255, 0.22);
+    --line:rgba(255, 255, 255, 0.24);
     --txt:#f8fafc;
     --dim:#cbd5e1;
     --accent:#38bdf8;
@@ -38,22 +38,28 @@
   /* gün sekmeleri */
   .days{display:flex; gap:4px; flex:0 0 auto;}
   .days button{
-    flex:1; padding:9px 0; border:1px solid var(--line);
+    position:relative; flex:1; padding:9px 0; border:1px solid var(--line);
     background:var(--panel); backdrop-filter:blur(8px); -webkit-backdrop-filter:blur(8px);
     color:var(--dim); border-radius:9px; font-size:13px; font-weight:600; cursor:pointer;
   }
   .days button.sel{background:var(--accent); border-color:#7dd3fc; color:#06131f;}
   .days button.today{box-shadow:inset 0 -3px 0 #fde047;}
+  .days button.duty::after{
+    content:""; position:absolute; top:4px; right:5px;
+    width:6px; height:6px; border-radius:50%; background:#ef4444;
+    box-shadow:0 0 4px rgba(239,68,68,0.9);
+  }
 
-  /* uçak kokpit göstergesi çerçevesi - kalan alana otomatik sığar */
+  /* uçak kokpit göstergesi çerçevesi - yarı şeffaf, arka plan görünür */
   .gauge{
     position:relative; flex:1 1 0; min-height:0;
-    background:linear-gradient(145deg, #273244 0%, #141b27 52%, #0c111a 100%);
-    border:2px solid #3c4b64;
+    background:linear-gradient(145deg, rgba(39,50,68,0.62) 0%, rgba(20,27,39,0.52) 52%, rgba(12,17,26,0.62) 100%);
+    backdrop-filter:blur(3px); -webkit-backdrop-filter:blur(3px);
+    border:2px solid rgba(148, 163, 184, 0.45);
     box-shadow:
-      0 8px 24px rgba(0, 0, 0, 0.48),
-      inset 0 1px 1px rgba(255, 255, 255, 0.2),
-      inset 0 -2px 6px rgba(0, 0, 0, 0.65);
+      0 8px 24px rgba(0, 0, 0, 0.35),
+      inset 0 1px 1px rgba(255, 255, 255, 0.25),
+      inset 0 -2px 6px rgba(0, 0, 0, 0.45);
     border-radius:16px;
     padding:8px;
     overflow:hidden;
@@ -66,13 +72,13 @@
     flex:0 0 auto;
     display:flex; align-items:center; justify-content:space-between;
     padding:4px 10px;
-    background:#070b12;
-    border:1px solid #28354b;
+    background:rgba(7, 11, 18, 0.72);
+    border:1px solid rgba(148, 163, 184, 0.28);
     border-radius:8px;
-    box-shadow:inset 0 2px 6px rgba(0,0,0,0.85);
+    box-shadow:inset 0 2px 6px rgba(0,0,0,0.65);
   }
   .bezel-title{
-    font-size:10px; letter-spacing:1.8px; color:#7c90b2; font-weight:700;
+    font-size:10px; letter-spacing:1.5px; color:#cbd5e1; font-weight:700;
     text-transform:uppercase;
   }
   .bezel-readout{
@@ -80,11 +86,11 @@
   }
   .bezel-readout .mode{
     font-size:10px; color:#38bdf8; letter-spacing:1.5px; font-weight:700;
-    padding:2px 6px; border-radius:4px; background:rgba(56,189,248,0.14);
-    border:1px solid rgba(56,189,248,0.35);
+    padding:2px 6px; border-radius:4px; background:rgba(56,189,248,0.16);
+    border:1px solid rgba(56,189,248,0.38);
   }
   .bezel-readout .mode.manual{
-    color:#fbbf24; background:rgba(251,191,36,0.14); border-color:rgba(251,191,36,0.4);
+    color:#fbbf24; background:rgba(251,191,36,0.16); border-color:rgba(251,191,36,0.45);
   }
   .bezel-readout .time{
     font-size:21px; font-weight:700; font-variant-numeric:tabular-nums;
@@ -94,10 +100,10 @@
 
   .gauge-screen{
     position:relative; flex:1 1 0; min-height:0;
-    background:#080d17;
-    border:1.5px solid #2a3850;
+    background:rgba(8, 13, 23, 0.24);
+    border:1.5px solid rgba(148, 163, 184, 0.32);
     border-radius:10px;
-    box-shadow:inset 0 0 18px rgba(0,0,0,0.9);
+    box-shadow:inset 0 0 14px rgba(0,0,0,0.48);
     overflow:hidden;
     display:flex; align-items:center; justify-content:center;
   }
@@ -153,10 +159,14 @@
   }
   .ed-days{display:flex; gap:4px; margin-bottom:10px;}
   .ed-days button{
-    flex:1; padding:8px 0; border:1px solid #24314f; background:#121a30;
+    position:relative; flex:1; padding:8px 0; border:1px solid #24314f; background:#121a30;
     color:#94a3b8; border-radius:8px; font-size:12.5px; font-weight:600; cursor:pointer;
   }
   .ed-days button.sel{background:var(--accent); border-color:var(--accent); color:#06131f;}
+  .ed-days button.duty::after{
+    content:""; position:absolute; top:3px; right:4px;
+    width:5px; height:5px; border-radius:50%; background:#ef4444;
+  }
   .editor-box{
     background:#121a30; border:1px solid #24314f;
     border-radius:12px; padding:10px;
@@ -165,17 +175,20 @@
     background:#0d1530; border:1px solid #24314f; border-radius:9px;
     padding:7px; margin-bottom:8px; display:flex; flex-direction:column; gap:6px;
   }
+  .row-card.duty-auto{
+    border-color:#7f1d1d; background:#1c1018;
+  }
   .row-line{display:flex; gap:5px; align-items:center;}
   .row-line input[type=text]{
     min-width:0; background:#121a30; border:1px solid #2a395c;
     color:var(--txt); border-radius:6px; padding:7px 6px; font-size:13px;
   }
-  .row-line input.f-p1{flex:0 0 58px; text-align:center;}
-  .row-line input.f-p2{flex:0 0 64px; text-align:center;}
+  .row-line input.f-p1{flex:0 0 68px; text-align:center;}
+  .row-line input.f-p2{flex:0 0 60px; text-align:center;}
   .row-line input.f-n{flex:1;}
-  .row-line input[type=color]{
-    flex:0 0 34px; height:32px; padding:2px; background:#121a30;
-    border:1px solid #2a395c; border-radius:6px; cursor:pointer;
+  .row-line .color-btn{
+    flex:0 0 34px; height:32px; border:2px solid #475a78;
+    border-radius:6px; cursor:pointer; padding:0;
   }
   .row-line input[type=time]{
     flex:1; min-width:0; background:#121a30; border:1px solid #2a395c;
@@ -198,6 +211,24 @@
     font-weight:600; cursor:pointer;
   }
   .ebtns .save{background:#22c55e; border-color:#22c55e; color:#06230f;}
+
+  /* En altta Nöbet Günü seçeneği */
+  .duty-box{
+    margin-top:12px; padding:10px 12px;
+    background:#171222; border:1px solid #4c2334; border-radius:10px;
+    display:flex; align-items:center; justify-content:space-between; gap:10px;
+    cursor:pointer; user-select:none;
+  }
+  .duty-box.active{
+    background:#2a121b; border-color:#ef4444;
+  }
+  .duty-info{flex:1;}
+  .duty-info .dt-title{font-size:13.5px; font-weight:700; color:#fecaca;}
+  .duty-info .dt-sub{font-size:11px; color:#fca5a5; opacity:0.85; margin-top:2px;}
+  .duty-box input[type=checkbox]{
+    width:20px; height:20px; accent-color:#ef4444; cursor:pointer; flex:0 0 auto;
+  }
+
   .hint{font-size:11px; color:#94a3b8; margin-top:8px; line-height:1.5;}
 
   /* Gelişmiş / Toplu işlemler */
@@ -220,6 +251,51 @@
     width:100%; padding:9px; border-radius:8px;
     background:#2a1620; border:1px solid #5c2838; color:#fca5a5;
     font-size:12.5px; font-weight:600; cursor:pointer;
+  }
+
+  /* 5'li Seçilen Renkler Modalı */
+  .cp-backdrop{
+    display:none; position:fixed; inset:0; z-index:40;
+    background:rgba(4, 7, 15, 0.72); backdrop-filter:blur(4px);
+    align-items:center; justify-content:center; padding:16px;
+  }
+  .cp-backdrop.open{display:flex;}
+  .cp-dialog{
+    width:100%; max-width:340px;
+    background:#121a30; border:1px solid #33456b; border-radius:14px;
+    padding:14px; box-shadow:0 16px 40px rgba(0,0,0,0.6);
+  }
+  .cp-head{
+    display:flex; justify-content:space-between; align-items:center;
+    margin-bottom:10px;
+  }
+  .cp-head span{font-size:14px; font-weight:700; color:#f8fafc;}
+  .cp-head button{
+    background:#1e293b; border:1px solid #334155; color:#cbd5e1;
+    border-radius:6px; padding:4px 10px; font-size:12px; cursor:pointer;
+  }
+  .cp-lbl{font-size:11px; color:#94a3b8; margin-bottom:6px; font-weight:600;}
+  .cp-swatches{
+    display:flex; gap:8px; margin-bottom:14px;
+  }
+  .cp-swatch{
+    flex:1; height:40px; border-radius:9px;
+    border:2px solid rgba(255,255,255,0.2); cursor:pointer;
+  }
+  .cp-swatch.active{
+    border-color:#ffffff; box-shadow:0 0 0 2px #38bdf8;
+  }
+  .cp-custom{
+    display:flex; gap:8px; align-items:center;
+  }
+  .cp-custom input[type=color]{
+    flex:0 0 54px; height:40px; padding:2px;
+    background:#0d1530; border:1px solid #33456b; border-radius:8px; cursor:pointer;
+  }
+  .cp-custom button{
+    flex:1; height:40px; border-radius:8px;
+    background:#38bdf8; border:none; color:#06131f;
+    font-size:13px; font-weight:700; cursor:pointer;
   }
 </style>
 </head>
@@ -280,7 +356,7 @@
   <!-- Uçak kokpit göstergesi çerçevesi -->
   <div class="gauge" id="gauge">
     <div class="bezel-bar">
-      <div class="bezel-title">ZAMAN GÖSTERGESİ · 60°</div>
+      <div class="bezel-title" id="bezelTitle">ZAMAN GÖSTERGESİ · 60°</div>
       <div class="bezel-readout">
         <div class="mode" id="mode">ŞİMDİ</div>
         <div class="time" id="clock">--:--</div>
@@ -288,27 +364,15 @@
     </div>
 
     <div class="gauge-screen">
-      <!--
-        180° toplam skala, ekranda tek seferde 60° (-30° .. +30°) görünür.
-        Çember merkezi ekran dışında solda: CX = -170, CY = 215
-        R_IN = 196 (sol yay), R_OUT = 414 (sağ yay), R_TICK = 434 (tik yayı)
-        60° yay yüksekliği = 2 * R_TICK * sin(30°) = 434 ≈ viewBox yüksekliği (430)
-      -->
       <svg id="svg" viewBox="0 0 320 430" preserveAspectRatio="xMidYMid meet" xmlns="http://www.w3.org/2000/svg">
         <defs>
-          <!-- Silindirik derinlik gölgesi (üst ve alt kenarlar hafif karartılır) -->
+          <!-- Hafif silindirik derinlik gölgesi (arka planı kapatmayacak şekilde şeffaf) -->
           <linearGradient id="drumShade" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stop-color="#04070d" stop-opacity="0.72"/>
-            <stop offset="18%" stop-color="#04070d" stop-opacity="0.16"/>
-            <stop offset="50%" stop-color="#ffffff" stop-opacity="0.04"/>
-            <stop offset="82%" stop-color="#04070d" stop-opacity="0.16"/>
-            <stop offset="100%" stop-color="#04070d" stop-opacity="0.72"/>
-          </linearGradient>
-          <!-- Cam yansıması -->
-          <linearGradient id="glassGlare" x1="0" y1="0" x2="1" y2="1">
-            <stop offset="0%" stop-color="#ffffff" stop-opacity="0.08"/>
-            <stop offset="35%" stop-color="#ffffff" stop-opacity="0"/>
-            <stop offset="100%" stop-color="#38bdf8" stop-opacity="0.04"/>
+            <stop offset="0%" stop-color="#04070d" stop-opacity="0.46"/>
+            <stop offset="20%" stop-color="#04070d" stop-opacity="0.08"/>
+            <stop offset="50%" stop-color="#ffffff" stop-opacity="0.03"/>
+            <stop offset="80%" stop-color="#04070d" stop-opacity="0.08"/>
+            <stop offset="100%" stop-color="#04070d" stop-opacity="0.46"/>
           </linearGradient>
           <clipPath id="vpClip">
             <rect x="0" y="0" width="320" height="430"/>
@@ -319,23 +383,22 @@
         <g clip-path="url(#vpClip)">
           <g id="rot"></g>
 
-          <!-- Silindirik gölge ve cam efekti -->
+          <!-- Hafif derinlik gölgesi -->
           <rect x="0" y="0" width="320" height="430" fill="url(#drumShade)" pointer-events="none"/>
-          <rect x="0" y="0" width="320" height="430" fill="url(#glassGlare)" pointer-events="none"/>
 
-          <!-- Sabit orta referans hattı (uçak göstergesi lubber line) -->
-          <line x1="8" y1="215" x2="296" y2="215" stroke="#fbbf24" stroke-width="1.2" stroke-dasharray="4 4" opacity="0.55" pointer-events="none"/>
+          <!-- Sabit orta referans hattı -->
+          <line x1="8" y1="215" x2="296" y2="215" stroke="#fbbf24" stroke-width="1.2" stroke-dasharray="4 4" opacity="0.65" pointer-events="none"/>
 
           <!-- Sol sabit indeks işareti -->
           <path d="M2 208 L14 215 L2 222 Z" fill="#fbbf24" pointer-events="none"/>
 
-          <!-- Sağ sabit ibre (uçak göstergesi üçgen işaretçi) -->
+          <!-- Sağ sabit ibre -->
           <line x1="316" y1="215" x2="274" y2="215" stroke="#fbbf24" stroke-width="2.5" stroke-linecap="round" pointer-events="none"/>
           <path d="M318 205 L318 225 L298 215 Z" fill="#fbbf24" stroke="#080d17" stroke-width="1" pointer-events="none"/>
         </g>
 
         <!-- 4 köşe kokpit vida detayları -->
-        <g fill="#263349" stroke="#475a78" stroke-width="1" pointer-events="none">
+        <g fill="#263349" stroke="#64748b" stroke-width="1" opacity="0.85" pointer-events="none">
           <circle cx="10" cy="10" r="3.5"/>
           <circle cx="310" cy="10" r="3.5"/>
           <circle cx="10" cy="420" r="3.5"/>
@@ -378,10 +441,21 @@
         <button id="addRow">+ Dilim ekle</button>
         <button class="save" id="saveBtn">Kaydet</button>
       </div>
+
+      <!-- En altta Nöbet Günü seçeneği -->
+      <label class="duty-box" id="dutyBox">
+        <div class="duty-info">
+          <div class="dt-title">Nöbet Günü</div>
+          <div class="dt-sub">Aralar kırmızı olur · 12:20–12:40 Yemekhane Nöbeti otomatik eklenir</div>
+        </div>
+        <input type="checkbox" id="dutyCheck">
+      </label>
+
       <div class="hint">
-        <b>Bölüm 1:</b> Ders no / Ara · <b>Bölüm 2:</b> Sınıf · <b>Bölüm 3:</b> Ders adı.
-        <b>↑ / ↓</b> butonlarıyla dilimleri taşıyabilir, <b>✕</b> ile silebilirsiniz.
+        <b>↑ / ↓</b> butonları kutuyu saat değerleriyle birlikte taşır.
+        Renk kutusuna basarak 5 kayıtlı renkten birini veya yeni ton seçebilirsiniz.
       </div>
+
       <details class="adv" id="advBox">
         <summary>Gelişmiş / Toplu İşlemler</summary>
         <div class="adv-body">
@@ -393,12 +467,34 @@
   </div>
 </div>
 
+<!-- 5 Seçilen Renk Seçici Modalı -->
+<div class="cp-backdrop" id="cpModal">
+  <div class="cp-dialog">
+    <div class="cp-head">
+      <span>Renk Seç</span>
+      <button id="cpClose">Kapat</button>
+    </div>
+    <div class="cp-lbl">Seçilen Renkler (Son 5)</div>
+    <div class="cp-swatches" id="cpSwatches"></div>
+    <div class="cp-lbl">Yeni Ton Seç</div>
+    <div class="cp-custom">
+      <input type="color" id="cpNative" value="#38bdf8">
+      <button id="cpApply">Bu Rengi Kullan</button>
+    </div>
+  </div>
+</div>
+
 <script>
 "use strict";
 const DAYS=["Pzt","Sal","Çar","Per","Cum"];
 const START=8*60+30, END=17*60, SPAN=END-START;       // 08:30–17:00 = 180°
 const ARC_DEG=180;
-const CX=-170, CY=215, R_IN=196, R_OUT=414, R_TICK=434;
+const CX=-170, CY=215, R_IN=190, R_OUT=414, R_TICK=434;
+
+const COL_LESSON="#38bdf8";   // Dersler: uygun mavi
+const COL_BREAK="#fef08a";    // Aralar: açık sarı
+const COL_LUNCH="#fbbf24";    // Yemek: sıcak kehribar
+const COL_DUTY="#ef4444";     // Nöbet: kırmızı
 
 // ---- yardımcılar ----
 const pad=n=>String(n).padStart(2,"0");
@@ -426,32 +522,61 @@ function fullLabel(s){
   return [s.p1, s.p2, s.n].map(x=>(x||"").trim()).filter(Boolean).join(" · ") || "—";
 }
 
+function textColorFor(hex){
+  if(!hex || hex[0]!=="#" || hex.length!==7) return "#06131f";
+  const r=parseInt(hex.slice(1,3),16);
+  const g=parseInt(hex.slice(3,5),16);
+  const b=parseInt(hex.slice(5,7),16);
+  return (0.299*r + 0.587*g + 0.114*b) < 138 ? "#ffffff" : "#06131f";
+}
+
+function isBreak(s){
+  const p1=(s.p1||"").trim().toLowerCase();
+  const n=(s.n||"").trim().toLowerCase();
+  return p1==="ara" || p1==="teneffüs" || (!p1 && n==="ara");
+}
+
+function isDutyLunch(s){
+  return !!s._dutyAuto || (s.s===toMin("12:20") && s.e===toMin("12:40") && ((s.n||"").toLowerCase().includes("yemekhane") || (s.p1||"").toLowerCase().includes("nöbet")));
+}
+
 // ---- hazır şablon ----
-function createDefaultDay(){
-  return [
-    {p1:"1",     p2:"", n:"Ders 1", c:"#38bdf8", s:toMin("09:00"), e:toMin("09:40")},
-    {p1:"Ara",   p2:"", n:"",       c:"#94a3b8", s:toMin("09:40"), e:toMin("09:50")},
-    {p1:"2",     p2:"", n:"Ders 2", c:"#34d399", s:toMin("09:50"), e:toMin("10:30")},
-    {p1:"Ara",   p2:"", n:"",       c:"#94a3b8", s:toMin("10:30"), e:toMin("10:40")},
-    {p1:"3",     p2:"", n:"Ders 3", c:"#38bdf8", s:toMin("10:40"), e:toMin("11:20")},
-    {p1:"Ara",   p2:"", n:"",       c:"#94a3b8", s:toMin("11:20"), e:toMin("11:25")},
-    {p1:"4",     p2:"", n:"Ders 4", c:"#34d399", s:toMin("11:25"), e:toMin("12:05")},
-    {p1:"Yemek", p2:"", n:"Öğle",   c:"#fbbf24", s:toMin("12:05"), e:toMin("12:45")},
-    {p1:"5",     p2:"", n:"Ders 5", c:"#818cf8", s:toMin("12:45"), e:toMin("13:25")},
-    {p1:"Ara",   p2:"", n:"",       c:"#94a3b8", s:toMin("13:25"), e:toMin("13:30")},
-    {p1:"6",     p2:"", n:"Ders 6", c:"#2dd4bf", s:toMin("13:30"), e:toMin("14:10")},
-    {p1:"Ara",   p2:"", n:"",       c:"#94a3b8", s:toMin("14:10"), e:toMin("14:20")},
-    {p1:"7",     p2:"", n:"Ders 7", c:"#818cf8", s:toMin("14:20"), e:toMin("15:00")},
-    {p1:"Ara",   p2:"", n:"",       c:"#94a3b8", s:toMin("15:00"), e:toMin("15:05")},
-    {p1:"8",     p2:"", n:"Ders 8", c:"#2dd4bf", s:toMin("15:05"), e:toMin("15:45")},
-    {p1:"Ara",   p2:"", n:"",       c:"#94a3b8", s:toMin("15:45"), e:toMin("15:50")},
-    {p1:"9",     p2:"", n:"Ders 9", c:"#fb7185", s:toMin("15:50"), e:toMin("16:30")}
+function createDefaultDay(isDuty=false){
+  const brkCol=isDuty?COL_DUTY:COL_BREAK;
+  const arr=[
+    {p1:"Ders 1", p2:"", n:"", c:COL_LESSON, s:toMin("09:00"), e:toMin("09:40")},
+    {p1:"Ara",    p2:"", n:"", c:brkCol,     s:toMin("09:40"), e:toMin("09:50")},
+    {p1:"Ders 2", p2:"", n:"", c:COL_LESSON, s:toMin("09:50"), e:toMin("10:30")},
+    {p1:"Ara",    p2:"", n:"", c:brkCol,     s:toMin("10:30"), e:toMin("10:40")},
+    {p1:"Ders 3", p2:"", n:"", c:COL_LESSON, s:toMin("10:40"), e:toMin("11:20")},
+    {p1:"Ara",    p2:"", n:"", c:brkCol,     s:toMin("11:20"), e:toMin("11:25")},
+    {p1:"Ders 4", p2:"", n:"", c:COL_LESSON, s:toMin("11:25"), e:toMin("12:05")},
+    {p1:"Yemek",  p2:"", n:"Öğle Arası", c:COL_LUNCH, s:toMin("12:05"), e:toMin("12:45")},
+    {p1:"Ders 5", p2:"", n:"", c:COL_LESSON, s:toMin("12:45"), e:toMin("13:25")},
+    {p1:"Ara",    p2:"", n:"", c:brkCol,     s:toMin("13:25"), e:toMin("13:30")},
+    {p1:"Ders 6", p2:"", n:"", c:COL_LESSON, s:toMin("13:30"), e:toMin("14:10")},
+    {p1:"Ara",    p2:"", n:"", c:brkCol,     s:toMin("14:10"), e:toMin("14:20")},
+    {p1:"Ders 7", p2:"", n:"", c:COL_LESSON, s:toMin("14:20"), e:toMin("15:00")},
+    {p1:"Ara",    p2:"", n:"", c:brkCol,     s:toMin("15:00"), e:toMin("15:05")},
+    {p1:"Ders 8", p2:"", n:"", c:COL_LESSON, s:toMin("15:05"), e:toMin("15:45")},
+    {p1:"Ara",    p2:"", n:"", c:brkCol,     s:toMin("15:45"), e:toMin("15:50")},
+    {p1:"Ders 9", p2:"", n:"", c:COL_LESSON, s:toMin("15:50"), e:toMin("16:30")}
   ];
+  if(isDuty){
+    arr.splice(8, 0, {
+      p1:"Nöbet", p2:"", n:"Yemekhane Nöbeti", c:COL_DUTY,
+      s:toMin("12:20"), e:toMin("12:40"), _dutyAuto:true
+    });
+  }
+  return arr;
 }
 
 // ---- veri ----
 let schedule={};
+let dutyDays={0:false,1:false,2:false,3:false,4:false};
+let savedColors=[COL_LESSON, COL_BREAK, COL_DUTY, COL_LUNCH, "#34d399"];
 let hasSaved=false;
+
 try{
   const raw=localStorage.getItem("dersGauge.v2");
   if(raw){
@@ -461,35 +586,81 @@ try{
       hasSaved=Object.values(p).some(arr=>Array.isArray(arr)&&arr.length>0);
     }
   }
+  const dRaw=localStorage.getItem("dersGauge.duty.v1");
+  if(dRaw){
+    const dp=JSON.parse(dRaw);
+    if(dp&&typeof dp==="object") dutyDays=Object.assign(dutyDays, dp);
+  }
+  const cRaw=localStorage.getItem("dersGauge.colors.v1");
+  if(cRaw){
+    const cp=JSON.parse(cRaw);
+    if(Array.isArray(cp)&&cp.length) savedColors=cp.slice(0,5);
+  }
 }catch(e){}
 
-function saveStore(){ try{localStorage.setItem("dersGauge.v2",JSON.stringify(schedule));}catch(e){} }
+function saveStore(){
+  try{
+    localStorage.setItem("dersGauge.v2", JSON.stringify(schedule));
+    localStorage.setItem("dersGauge.duty.v1", JSON.stringify(dutyDays));
+    localStorage.setItem("dersGauge.colors.v1", JSON.stringify(savedColors));
+  }catch(e){}
+}
 
 if(!hasSaved){
-  for(let i=0;i<5;i++) schedule[i]=createDefaultDay();
+  for(let i=0;i<5;i++) schedule[i]=createDefaultDay(!!dutyDays[i]);
   saveStore();
 }else{
   for(let i=0;i<5;i++) if(!Array.isArray(schedule[i])) schedule[i]=[];
 }
 
-function segsFor(day){ return (schedule[day]||[]).slice().sort((a,b)=>a.s-b.s); }
+function segsFor(day){
+  // Çizimde uzun/kapsayıcı dilimler altta, kısa/iç dilimler (örn. 12:20-12:40 nöbet) üstte olsun
+  return (schedule[day]||[]).slice().sort((a,b)=>(a.s-b.s)||((b.e-b.s)-(a.e-a.s)));
+}
+
+// ---- nöbet günü uygulama ----
+function applyDutyForDay(day, enabled){
+  dutyDays[day]=!!enabled;
+  const arr=schedule[day]||(schedule[day]=[]);
+  // Araların rengini güncelle
+  arr.forEach(s=>{
+    if(isBreak(s)) s.c=enabled?COL_DUTY:COL_BREAK;
+  });
+
+  if(enabled){
+    // 12:20-12:40 yemekhane nöbeti yoksa otomatik ekle
+    if(!arr.some(isDutyLunch)){
+      const dutyItem={
+        p1:"Nöbet", p2:"", n:"Yemekhane Nöbeti", c:COL_DUTY,
+        s:toMin("12:20"), e:toMin("12:40"), _dutyAuto:true
+      };
+      // Uygun konuma (12:20'den hemen önce/sonra) yerleştir
+      let pos=arr.findIndex(x=>x.s>dutyItem.s);
+      if(pos===-1) arr.push(dutyItem);
+      else arr.splice(pos, 0, dutyItem);
+    }
+  }else{
+    // Otomatik eklenen yemekhane nöbetini çıkar
+    schedule[day]=arr.filter(s=>!isDutyLunch(s));
+  }
+}
 
 // ---- durum ----
 function getTodayIdx(){
-  const wd=(new Date().getDay()+6)%7; // 0=Pzt .. 4=Cum, 5=Cmt, 6=Paz
+  const wd=(new Date().getDay()+6)%7;
   return wd<5?wd:-1;
 }
 let todayIdx=getTodayIdx();
 let selDay=todayIdx>=0?todayIdx:0;
 let live=true, viewTime=START, dragging=false, lastAng=0;
 
-// ---- çizim (180° tambur, 60° görüş açılı uçak göstergesi) ----
+// ---- çizim (180° yarı şeffaf tambur, 60° görüş açılı uçak göstergesi) ----
 const rot=document.getElementById("rot");
 function buildRing(){
   let h="";
 
-  // 180° zemin şeridi (08:30–17:00 + küçük baş/son marjı)
-  h+=`<path d="${wedgePath(-12, ARC_DEG+12, R_IN, R_OUT)}" fill="#101829" stroke="#24334d" stroke-width="1.5"/>`;
+  // 180° yarı şeffaf zemin şeridi (arka plan görünür)
+  h+=`<path d="${wedgePath(-12, ARC_DEG+12, R_IN, R_OUT)}" fill="rgba(15,23,42,0.28)" stroke="rgba(148,163,184,0.35)" stroke-width="1.2"/>`;
 
   // ders ve ara dilimleri
   for(const s of segsFor(selDay)){
@@ -497,28 +668,28 @@ function buildRing(){
     const da=a2-a1;
     if(da<=0) continue;
 
-    h+=`<path d="${wedgePath(a1,a2,R_IN,R_OUT)}" fill="${s.c}" fill-opacity="0.88" stroke="#080d17" stroke-width="1.4"/>`;
+    h+=`<path d="${wedgePath(a1,a2,R_IN,R_OUT)}" fill="${s.c}" fill-opacity="0.74" stroke="rgba(8,13,23,0.75)" stroke-width="1.3"/>`;
 
     const mid=(a1+a2)/2;
-    const p1=(s.p1||"").trim().slice(0,5);
+    const p1=(s.p1||"").trim().slice(0,8);
     const p2=(s.p2||"").trim().slice(0,6);
     const p3=(s.n||"").trim().slice(0,18);
+    const txtCol=textColorFor(s.c);
 
-    // 180° skalada 10 dk ≈ 3.5°, 40 dk ≈ 14.1°
     if(da>=2.8){
       const small=da<6;
-      const fs1=small?9.5:12.5;
-      const fs2=small?9.5:12.5;
-      const fs3=small?10:13.5;
-      h+=`<g transform="rotate(${mid.toFixed(2)} ${CX} ${CY})" fill="#06131f" font-weight="700" dominant-baseline="central">`;
+      const fs1=small?9:11.5;
+      const fs2=small?9.5:12;
+      const fs3=small?10:13;
+      h+=`<g transform="rotate(${mid.toFixed(2)} ${CX} ${CY})" fill="${txtCol}" font-weight="700" dominant-baseline="central">`;
       if(p1){
-        h+=`<text x="${CX+222}" y="${CY}" font-size="${fs1}" text-anchor="middle">${esc(p1)}</text>`;
+        h+=`<text x="${CX+219}" y="${CY}" font-size="${fs1}" text-anchor="middle">${esc(p1)}</text>`;
       }
       if(p2){
-        h+=`<text x="${CX+268}" y="${CY}" font-size="${fs2}" text-anchor="middle">${esc(p2)}</text>`;
+        h+=`<text x="${CX+271}" y="${CY}" font-size="${fs2}" text-anchor="middle">${esc(p2)}</text>`;
       }
       if(p3){
-        const startX=(p1||p2)?(CX+296):(CX+220);
+        const startX=(p1||p2)?(CX+300):(CX+212);
         h+=`<text x="${startX}" y="${CY}" font-size="${fs3}" text-anchor="start">${esc(p3)}</text>`;
       }
       h+=`</g>`;
@@ -526,36 +697,36 @@ function buildRing(){
   }
 
   // Sütun ayırıcı ince yaylar (Bölüm 1 | Bölüm 2 | Bölüm 3)
-  h+=`<path d="${arcLine(0, ARC_DEG, 246)}" fill="none" stroke="rgba(6,19,31,0.28)" stroke-width="1" stroke-dasharray="3 3"/>`;
-  h+=`<path d="${arcLine(0, ARC_DEG, 288)}" fill="none" stroke="rgba(6,19,31,0.28)" stroke-width="1" stroke-dasharray="3 3"/>`;
+  h+=`<path d="${arcLine(0, ARC_DEG, 248)}" fill="none" stroke="rgba(15,23,42,0.32)" stroke-width="1" stroke-dasharray="3 3"/>`;
+  h+=`<path d="${arcLine(0, ARC_DEG, 294)}" fill="none" stroke="rgba(15,23,42,0.32)" stroke-width="1" stroke-dasharray="3 3"/>`;
 
-  // İç ve dış kılavuz yayları (gösterge sınır çizgileri)
-  h+=`<path d="${arcLine(-12, ARC_DEG+12, R_IN)}" fill="none" stroke="#475a78" stroke-width="1.5"/>`;
-  h+=`<path d="${arcLine(-12, ARC_DEG+12, R_OUT)}" fill="none" stroke="#64748b" stroke-width="1.5"/>`;
-  h+=`<path d="${arcLine(0, ARC_DEG, R_TICK)}" fill="none" stroke="#334155" stroke-width="1"/>`;
+  // İç ve dış kılavuz yayları
+  h+=`<path d="${arcLine(-12, ARC_DEG+12, R_IN)}" fill="none" stroke="rgba(226,232,240,0.45)" stroke-width="1.5"/>`;
+  h+=`<path d="${arcLine(-12, ARC_DEG+12, R_OUT)}" fill="none" stroke="rgba(226,232,240,0.55)" stroke-width="1.5"/>`;
+  h+=`<path d="${arcLine(0, ARC_DEG, R_TICK)}" fill="none" stroke="rgba(226,232,240,0.28)" stroke-width="1"/>`;
 
   // Başlangıç (08:30) ve bitiş (17:00) sınır çizgileri
   for(const lim of [0, ARC_DEG]){
     const [x1,y1]=pol(lim, R_IN), [x2,y2]=pol(lim, R_TICK);
-    h+=`<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="#fbbf24" stroke-width="1.5" opacity="0.7"/>`;
+    h+=`<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="#fbbf24" stroke-width="1.5" opacity="0.8"/>`;
   }
 
-  // Hassas uçak göstergesi tikleri (5 dk, 10 dk, 30 dk, 60 dk) + saat rakamları
+  // Hassas tikler + saat rakamları
   for(let m=START; m<=END; m+=5){
     const ang=a4t(m);
     const hour=m%60===0, half=m%30===0, ten=m%10===0;
     const len=hour?18:(half?13:(ten?8:5));
     const [x1,y1]=pol(ang, R_TICK), [x2,y2]=pol(ang, R_TICK-len);
-    const col=hour?"#f8fafc":(half?"#cbd5e1":"#64748b");
+    const col=hour?"#ffffff":(half?"#e2e8f0":"#94a3b8");
     const sw=hour?2:(half?1.4:1);
     h+=`<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="${col}" stroke-width="${sw}"/>`;
 
     if(hour){
       const [tx,ty]=pol(ang, R_TICK+17);
-      h+=`<text x="${tx}" y="${ty}" font-size="13" font-weight="700" fill="#f8fafc" text-anchor="middle" dominant-baseline="central" transform="rotate(${ang.toFixed(2)} ${tx} ${ty})">${pad(m/60)}</text>`;
+      h+=`<text x="${tx}" y="${ty}" font-size="13" font-weight="700" fill="#ffffff" stroke="rgba(8,13,23,0.6)" stroke-width="2" paint-order="stroke" text-anchor="middle" dominant-baseline="central" transform="rotate(${ang.toFixed(2)} ${tx} ${ty})">${pad(m/60)}</text>`;
     }else if(half){
       const [tx,ty]=pol(ang, R_TICK+15);
-      h+=`<text x="${tx}" y="${ty}" font-size="9.5" font-weight="600" fill="#94a3b8" text-anchor="middle" dominant-baseline="central" transform="rotate(${ang.toFixed(2)} ${tx} ${ty})">:30</text>`;
+      h+=`<text x="${tx}" y="${ty}" font-size="9.5" font-weight="700" fill="#e2e8f0" stroke="rgba(8,13,23,0.5)" stroke-width="1.5" paint-order="stroke" text-anchor="middle" dominant-baseline="central" transform="rotate(${ang.toFixed(2)} ${tx} ${ty})">:30</text>`;
     }
   }
 
@@ -566,8 +737,11 @@ function setRotation(){ rot.setAttribute("transform",`rotate(${(-a4t(viewTime)).
 // ---- durum kartları ----
 function updateStatus(){
   const segs=segsFor(selDay), t=viewTime;
-  const cur=segs.find(s=>t>=s.s&&t<s.e);
+  // Örtüşen dilimlerde (örn. Yemek içinde Yemekhane Nöbeti) daha kısa/spesifik olanı seç
+  const activeList=segs.filter(s=>t>=s.s&&t<s.e).sort((a,b)=>(a.e-a.s)-(b.e-b.s));
+  const cur=activeList[0];
   const nxt=segs.find(s=>s.s>t);
+
   const cN=document.getElementById("curName"),cS=document.getElementById("curSub");
   const nN=document.getElementById("nextName"),nS=document.getElementById("nextSub");
   if(cur){
@@ -580,11 +754,13 @@ function updateStatus(){
     nN.innerHTML=`<span class="dot" style="background:${nxt.c}"></span>${esc(fullLabel(nxt))}`;
     nS.textContent=`${fmt(nxt.s)} · ${Math.ceil(nxt.s-t)} dk sonra`;
   }else{nN.textContent="—"; nS.textContent="";}
+
   document.getElementById("clock").textContent=fmt(viewTime);
   const mode=document.getElementById("mode");
   const nowRaw=nowMin();
   mode.textContent=live?(nowRaw<START||nowRaw>END?"GÜN DIŞI":"ŞİMDİ"):"ELLE";
   mode.className="mode"+(live?"":" manual");
+  document.getElementById("bezelTitle").textContent=dutyDays[selDay]?"NÖBET GÜNÜ · 60°":"ZAMAN GÖSTERGESİ · 60°";
 }
 function refresh(){ setRotation(); updateStatus(); }
 
@@ -594,7 +770,7 @@ function buildDays(){
   DAYS.forEach((d,i)=>{
     const b=document.createElement("button");
     b.textContent=d;
-    b.className=(i===selDay?"sel ":"")+(i===todayIdx?"today":"");
+    b.className=(i===selDay?"sel ":"")+(i===todayIdx?"today ":"")+(dutyDays[i]?"duty":"");
     b.onclick=()=>{selDay=i; buildDays(); buildRing(); refresh();};
     el.appendChild(b);
   });
@@ -624,7 +800,7 @@ document.getElementById("nowBtn").onclick=()=>{
   refresh();
 };
 
-// ---- sürükleme (180° skalaya göre) ----
+// ---- sürükleme ----
 const svg=document.getElementById("svg");
 function angOf(ev){
   const pt=svg.createSVGPoint();
@@ -650,9 +826,53 @@ svg.addEventListener("pointermove",ev=>{
 });
 ["pointerup","pointercancel"].forEach(e=>svg.addEventListener(e,()=>dragging=false));
 
+// ---- 5 Seçilen Renk Modalı ----
+const cpModal=document.getElementById("cpModal");
+const cpSwatches=document.getElementById("cpSwatches");
+const cpNative=document.getElementById("cpNative");
+let cpTargetIdx=-1;
+
+function rememberColor(hex){
+  hex=hex.toLowerCase();
+  savedColors=[hex, ...savedColors.filter(c=>c.toLowerCase()!==hex)].slice(0,5);
+  saveStore();
+}
+
+function openColorPicker(rowIdx){
+  cpTargetIdx=rowIdx;
+  const curCol=(schedule[selDay][rowIdx].c||COL_LESSON).toLowerCase();
+  cpNative.value=curCol;
+  cpSwatches.innerHTML="";
+  savedColors.slice(0,5).forEach(col=>{
+    const btn=document.createElement("button");
+    btn.className="cp-swatch"+(col.toLowerCase()===curCol?" active":"");
+    btn.style.background=col;
+    btn.onclick=()=>{
+      schedule[selDay][cpTargetIdx].c=col;
+      cpModal.classList.remove("open");
+      buildEditor();
+    };
+    cpSwatches.appendChild(btn);
+  });
+  cpModal.classList.add("open");
+}
+
+document.getElementById("cpApply").onclick=()=>{
+  const col=cpNative.value;
+  if(cpTargetIdx>=0 && schedule[selDay][cpTargetIdx]){
+    schedule[selDay][cpTargetIdx].c=col;
+    rememberColor(col);
+  }
+  cpModal.classList.remove("open");
+  buildEditor();
+};
+document.getElementById("cpClose").onclick=()=>cpModal.classList.remove("open");
+cpModal.onclick=e=>{ if(e.target===cpModal) cpModal.classList.remove("open"); };
+
 // ---- düzenle modalı ----
-const PALETTE=["#38bdf8","#34d399","#fbbf24","#818cf8","#fb7185","#2dd4bf"];
 const editorModal=document.getElementById("editorModal");
+const dutyCheck=document.getElementById("dutyCheck");
+const dutyBox=document.getElementById("dutyBox");
 
 document.getElementById("editBtn").onclick=()=>{
   document.getElementById("advBox").open=false;
@@ -664,32 +884,24 @@ document.getElementById("closeEditor").onclick=()=>{
   buildDays(); buildRing(); refresh();
 };
 
-// Dilim taşıma (süreleri koruyarak saatleri günceller)
+// Kutu saat değerleriyle birlikte yukarı/aşağı taşınır
 function moveRow(i, dir){
   const arr=schedule[selDay];
   const j=i+dir;
   if(j<0||j>=arr.length) return;
-  const idx1=Math.min(i,j), idx2=Math.max(i,j);
-  const a=arr[idx1], b=arr[idx2];
-  const durA=Math.max(5, a.e-a.s);
-  const durB=Math.max(5, b.e-b.s);
-  const contiguous=Math.abs(a.e-b.s)<=1;
-  const start0=a.s;
-
-  arr[idx1]=b; arr[idx2]=a;
-
-  if(contiguous){
-    b.s=start0;
-    b.e=Math.min(END, start0+durB);
-    a.s=b.e;
-    a.e=Math.min(END, a.s+durA);
-  }else{
-    const ts=a.s, te=a.e;
-    a.s=b.s; a.e=b.e;
-    b.s=ts;  b.e=te;
-  }
+  const tmp=arr[i];
+  arr[i]=arr[j];
+  arr[j]=tmp;
   buildEditor();
 }
+
+dutyCheck.onchange=()=>{
+  applyDutyForDay(selDay, dutyCheck.checked);
+  saveStore();
+  buildEditor();
+  buildDays(); buildRing(); refresh();
+  toast(dutyCheck.checked?"Nöbet günü aktif edildi.":"Nöbet günü kapatıldı.");
+};
 
 function buildEditor(){
   document.getElementById("editTitle").textContent=DAYS[selDay]+" Programı";
@@ -697,23 +909,28 @@ function buildEditor(){
   DAYS.forEach((d,i)=>{
     const b=document.createElement("button");
     b.textContent=d;
-    if(i===selDay) b.className="sel";
+    b.className=(i===selDay?"sel ":"")+(dutyDays[i]?"duty":"");
     b.onclick=()=>{selDay=i; buildEditor();};
     edDays.appendChild(b);
   });
 
+  // Nöbet günü checkbox durumu
+  dutyCheck.checked=!!dutyDays[selDay];
+  dutyBox.classList.toggle("active", !!dutyDays[selDay]);
+
   const arr=schedule[selDay]||[];
   const rows=document.getElementById("rows"); rows.innerHTML="";
   arr.forEach((b,i)=>{
-    const card=document.createElement("div"); card.className="row-card";
+    const card=document.createElement("div");
+    card.className="row-card"+(b._dutyAuto?" duty-auto":"");
     card.innerHTML=`
       <div class="row-line">
-        <input class="f-p1" type="text" value="${esc(b.p1)}" placeholder="No/Ara" data-i="${i}" data-f="p1">
+        <input class="f-p1" type="text" value="${esc(b.p1)}" placeholder="Ders 1/Ara" data-i="${i}" data-f="p1">
         <input class="f-p2" type="text" value="${esc(b.p2)}" placeholder="Sınıf" data-i="${i}" data-f="p2">
         <input class="f-n"  type="text" value="${esc(b.n)}"  placeholder="Ders adı" data-i="${i}" data-f="n">
       </div>
       <div class="row-line">
-        <input type="color" value="${b.c}" data-i="${i}" data-f="c">
+        <button class="color-btn" style="background:${b.c}" data-i="${i}" title="Renk seç"></button>
         <input type="time" value="${fmt(b.s)}" data-i="${i}" data-f="s">
         <input type="time" value="${fmt(b.e)}" data-i="${i}" data-f="e">
         <button class="mv" data-i="${i}" data-dir="-1" ${i===0?"disabled":""} title="Yukarı taşı">↑</button>
@@ -726,8 +943,11 @@ function buildEditor(){
   rows.querySelectorAll("input").forEach(el=>{
     el.onchange=()=>{
       const b=schedule[selDay][+el.dataset.i], f=el.dataset.f;
-      if(f==="n"||f==="c"||f==="p1"||f==="p2") b[f]=el.value; else b[f]=toMin(el.value);
+      if(f==="n"||f==="p1"||f==="p2") b[f]=el.value; else b[f]=toMin(el.value);
     };
+  });
+  rows.querySelectorAll(".color-btn").forEach(el=>{
+    el.onclick=()=>openColorPicker(+el.dataset.i);
   });
   rows.querySelectorAll(".mv").forEach(el=>{
     el.onclick=()=>moveRow(+el.dataset.i, +el.dataset.dir);
@@ -740,13 +960,13 @@ function buildEditor(){
 document.getElementById("addRow").onclick=()=>{
   const b=schedule[selDay]||(schedule[selDay]=[]);
   const last=b.length?Math.max(...b.map(x=>x.e)):toMin("09:00");
-  b.push({p1:"", p2:"", n:"", c:PALETTE[b.length%PALETTE.length], s:Math.min(last,END-40), e:Math.min(last+40,END)});
+  b.push({p1:"", p2:"", n:"", c:COL_LESSON, s:Math.min(last,END-40), e:Math.min(last+40,END)});
   buildEditor();
 };
 
 document.getElementById("loadTemplateDay").onclick=()=>{
   if(!confirm(DAYS[selDay]+" günü 09:00–16:30 hazır ders şablonu ile değiştirilecek. Emin misiniz?")) return;
-  schedule[selDay]=createDefaultDay();
+  schedule[selDay]=createDefaultDay(!!dutyDays[selDay]);
   saveStore(); buildRing(); buildEditor(); refresh();
   document.getElementById("advBox").open=false;
   toast("Hazır şablon yüklendi.");
@@ -754,21 +974,26 @@ document.getElementById("loadTemplateDay").onclick=()=>{
 
 document.getElementById("copyDay").onclick=()=>{
   if(!confirm(DAYS[selDay]+" programı diğer tüm günlerin üzerine yazılacak. Emin misiniz?")) return;
-  for(let i=0;i<5;i++) if(i!==selDay) schedule[i]=schedule[selDay].map(b=>({...b}));
+  for(let i=0;i<5;i++){
+    if(i!==selDay){
+      schedule[i]=schedule[selDay].map(b=>({...b}));
+      // Kopyalanan gün nöbet günü değilse araları ve yemekhane nöbetini kendi durumuna göre koru
+      applyDutyForDay(i, !!dutyDays[i]);
+    }
+  }
   saveStore();
   document.getElementById("advBox").open=false;
   toast("Tüm günlere kopyalandı.");
 };
 
 document.getElementById("saveBtn").onclick=()=>{
-  schedule[selDay].sort((a,b)=>a.s-b.s);
   saveStore(); buildDays(); buildRing(); buildEditor(); refresh(); toast("Kaydedildi.");
 };
 
 function toast(msg){
   const n=document.createElement("div");
   n.textContent=msg;
-  n.style.cssText="position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:#22c55e;color:#06230f;padding:8px 16px;border-radius:8px;font-weight:600;font-size:13px;z-index:30";
+  n.style.cssText="position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:#22c55e;color:#06230f;padding:8px 16px;border-radius:8px;font-weight:600;font-size:13px;z-index:50";
   document.body.appendChild(n); setTimeout(()=>n.remove(),1600);
 }
 
